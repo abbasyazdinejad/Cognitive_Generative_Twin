@@ -1,0 +1,27 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='cgt-industrial-cps',
+    version='1.0.0',
+    description='Cognitive Generative Twin for Industrial Cyber-Physical Systems',
+    author='CGT Implementation Team',
+    packages=find_packages(),
+    install_requires=[
+        'torch>=2.3.0',
+        'numpy>=1.26.4',
+        'pandas>=2.2.2',
+        'scikit-learn>=1.4.2',
+        'scipy>=1.13.0',
+        'matplotlib>=3.8.4',
+        'seaborn>=0.13.2',
+        'tqdm>=4.66.4',
+        'pyyaml>=6.0.1',
+        'tensorboard>=2.16.2',
+        'openpyxl>=3.1.2',
+        'xlrd>=2.0.1',
+        'fastdtw>=0.3.4',
+        'ollama>=0.1.8',
+        'gymnasium>=0.29.1'
+    ],
+    python_requires='>=3.9',
+)

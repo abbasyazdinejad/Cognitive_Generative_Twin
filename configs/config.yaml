@@ -1,0 +1,156 @@
+project:
+  name: CGT_Industrial_CPS
+  seed: 42
+  device: auto
+  root_dir: ./
+  data_dir: ./data
+  exp_dir: ./experiments
+  results_dir: ./results
+
+data:
+  raw_dir: ./data/raw
+  processed_dir: ./data/processed
+  interim_dir: ./data/interim
+  
+  window_size: 256
+  stride: 64
+  
+  swat:
+    normal_file: SWaT_Dataset_Normal_v1.xlsx
+    attack_file: SWaT_Dataset_Attack_v0.xlsx
+    sheet_name_normal: Normal
+    sheet_name_attack: Attack
+  
+  wadi:
+    train_file: WADI_14days_new.csv
+    attack_file: WADI_attackdataLABLE.csv
+  
+  wesad:
+    subjects: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17]
+    chest_fs: 700
+    wrist_fs: 64
+    target_fs: 4
+  
+  swell:
+    subjects: null
+  
+  split:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+
+model:
+  encoder:
+    cps:
+      type: gru
+      input_dim: 51
+      hidden_dim: 128
+      num_layers: 2
+      dropout: 0.2
+      bidirectional: true
+    
+    bio:
+      type: gru
+      input_dim: 8
+      hidden_dim: 128
+      num_layers: 2
+      dropout: 0.2
+      bidirectional: true
+    
+    beh:
+      type: gru
+      input_dim: 12
+      hidden_dim: 128
+      num_layers: 2
+      dropout: 0.2
+      bidirectional: true
+  
+  cvae:
+    latent_dim: 64
+    encoder_hidden: [256, 256]
+    decoder_hidden: [256, 256]
+    condition_dim: 16
+    beta: 1.0
+  
+  diffusion:
+    timesteps: 100
+    beta_start: 0.0001
+    beta_end: 0.02
+    schedule: linear
+    hidden_dim: 256
+    sampling_steps: 50
+  
+  baseline:
+    type: lstm_ae
+    hidden_dim: 128
+    num_layers: 1
+    bidirectional: false
+    dropout: 0.0
+  
+  llm:
+    models:
+      - llama3.2
+      - mistral
+      - deepseek-r1:8b
+      - gemma2:12b
+    temperature: 0.7
+    max_tokens: 256
+    top_k: 40
+    top_p: 0.9
+  
+  rl:
+    algorithm: ppo
+    state_dim: 65
+    action_dim: 27
+    hidden_dim: 128
+    learning_rate: 0.0003
+    gamma: 0.99
+    gae_lambda: 0.95
+    clip_epsilon: 0.2
+    value_coef: 0.5
+    entropy_coef: 0.01
+
+training:
+  generative:
+    batch_size: 64
+    epochs: 150
+    learning_rate: 0.0001
+    weight_decay: 0.00001
+    scheduler: cosine
+    warmup_epochs: 10
+    grad_clip: 1.0
+    early_stopping_patience: 20
+  
+  baseline:
+    batch_size: 64
+    epochs: 12
+    learning_rate: 0.001
+    weight_decay: 0.00001
+  
+  rl:
+    episodes: 500
+    timesteps_per_episode: 100
+    update_frequency: 10
+    buffer_size: 10000
+    batch_size: 64
+    train_epochs: 10
+
+evaluation:
+  metrics:
+    - dtw
+    - mmd
+    - discriminator
+    - reconstruction_error
+    - roc_auc
+    - average_precision
+    - cf_consistency
+  
+  robustness:
+    noise_levels: [0.05, 0.10, 0.15]
+    dropout_rates: [0.10, 0.20, 0.30]
+    num_trials: 5
+  
+  operational:
+    num_simulations: 100
+    attack_windows: 8
+    num_analysts: 5
