@@ -12,7 +12,7 @@ The project is written in Python and is designed to be **config-driven**: almost
 
 ---
 
-## 1. Project Structure
+## Project Structure
 
 ```text
 Cognitive_Generative_Twin/
